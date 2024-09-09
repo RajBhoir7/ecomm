@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+
+
+{% block start %}
+<section class="section-conten padding-y" style="min-height:84vh">
+        <div class="card mx-auto" style="max-width: 380px; margin-top:100px;">
+          <div class="card-body">
+          <h4 class="card-title mb-4">Register</h4>
+          {% include 'base/aleart.html' %}
+
+
+          <form method="POST">
+            {% csrf_token %}
+
+          <div class="form-group">
+                 <input class="form-control" placeholder="First Name" type="text" name="first_name">
+              </div> 
+              <div class="form-group">
+                <input  class="form-control" placeholder="Last Name" type="text" name="last_name">
+             </div> 
+             <div class="form-group">
+                <input n class="form-control" placeholder="Email" type="text" name="email">
+             </div> 
+              <div class="form-group">
+                <input  class="form-control" placeholder="Password" type="password" name="password">
+              </div> 
+              
+              <div class="form-group">
+                   
+                <label class="float-left custom-control custom-checkbox"> <input type="checkbox" class="custom-control-input" checked=""> <div class="custom-control-label"> Remember </div> </label>
+              </div> 
+              <div class="form-group">
+                  <button type="submit" class="btn btn-primary btn-block"> Register  </button>
+              </div>     
+          </form>
+          </div> 
+        </div> 
+    
+         <p class="text-center mt-4">Already have account? <a href="{% url 'login' %}">Login</a></p>
+         <br><br>
+    
+    
+    </section>
+
+{% endblock %}

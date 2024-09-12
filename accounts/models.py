@@ -14,6 +14,8 @@ class Profile(BaseModel):
     email_token = models.CharField(max_length=120,null=True,blank=True)
     profile_image = models.ImageField(upload_to='profile')
 
+    def __str__(self) -> str:
+        return self.user.username
 
 
 @receiver(post_save,sender=User)

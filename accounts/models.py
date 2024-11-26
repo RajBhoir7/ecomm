@@ -7,7 +7,8 @@ import uuid
 from django.dispatch import receiver
 from base.emails import send_account_activation_email
 from products.models import Product,SizeVariant
-from products.models import ProductImage,Product
+from products.models import ProductImage,Product,Coupon
+
 
 class Profile(BaseModel):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
@@ -25,6 +26,7 @@ class Profile(BaseModel):
 
 class Cart(BaseModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='carts')
+    coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,blank=True,null=True)
     is_paid = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -39,6 +41,9 @@ class Cart(BaseModel):
             if cart_item.size_variant.price:
                 size_variant_price = cart_item.size_variant.price
                 price.append(size_variant_price)
+
+        if self.coupon:
+            return sum(price) - self.coupon.discount_price
 
         return sum(price)
     

@@ -53,12 +53,18 @@ class Product(BaseModel):
         return self.price + SizeVariant.objects.get(size_name = size).price
 
     
-
-
-
 class ProductImage(BaseModel):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_images')
     image = models.ImageField(upload_to='product')
 
     def __str__(self) -> str:
         return self.product.product_name
+    
+class Coupon(BaseModel):
+    coupon_code = models.CharField(max_length=200)
+    is_expired = models.BooleanField(default=False)
+    discount_price = models.IntegerField(default=100)
+    min_amount = models.IntegerField(default=500)
+
+    def __str__(self) -> str:
+        return self.coupon_code

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,login
 from .models import Profile,CartItems,Cart
-from products.models import ProductImage,Product
+from products.models import ProductImage,Product,Coupon
 
 
 
@@ -89,5 +89,39 @@ def remove_cart(request,cart_item_uid):
 def Cart_view(request):   
 
     context = {'cart_items':CartItems.objects.filter(cart=Cart.objects.get(is_paid=False,user=request.user)),
-               'cart':Cart.objects.get(is_paid=False,user=request.user)               }
+               'cart':Cart.objects.get(is_paid=False,user=request.user)}
+    cart_obj = Cart.objects.get(is_paid=False,user=request.user)
+    if request.method == 'POST':
+        coupon = request.POST.get('coupon_code')
+        coupon_obj = Coupon.objects.filter(coupon_code__icontains=coupon)
+
+        if not coupon_obj.exists():
+            messages.warning(request, "Invalid Coupon")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+        if cart_obj.coupon:
+            messages.warning(request, "Coupon alredy exits")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+        if cart_obj.get_cart_total() < coupon_obj[0].min_amount:
+            messages.warning(request, f"Amount should be greater than {coupon_obj[0].min_amount}")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+        if coupon_obj[0].is_expired:
+            messages.warning(request, f"Coupon is Expired")
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            
+        cart_obj.coupon = coupon_obj[0]
+        cart_obj.save()
+        messages.success(request, "Coupon applied")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    
     return render(request,'accounts/carts.html',context)
+
+
+def remove_coupon(request,cart_id):
+    cart = Cart.objects.get(uid=cart_id)
+    cart.coupon = None
+    cart.save()
+    messages.success(request,'Coupon Removed!')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

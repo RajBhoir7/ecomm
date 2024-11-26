@@ -5,7 +5,7 @@
 
 
 
-{{cart}}
+
 
 <section class="section-content padding-y">
     <div class="container">
@@ -50,11 +50,11 @@
         </td>
         <td> 
             <div class="price-wrap"> 
-                <var class="price">$    
+                <var class="price">₹  
                         {{item.get_product_price}}.00
     
                 </var> 
-                <small class="text-muted"> ${{item.get_product_price}}.00 each </small> 
+                <small class="text-muted"> ₹{{item.get_product_price}}.00 each </small> 
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 
@@ -83,33 +83,37 @@
         </main> <!-- col.// -->
         <aside class="col-md-3">
             <div class="card mb-3">
+                
                 <div class="card-body">
-                <form>
+                    {% include 'base/aleart.html' %}
+                <form method="POST">
+                    {% csrf_token %}
                     <div class="form-group">
                         <label>Have coupon?</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" name="" placeholder="Coupon code">
+                            <input type="text" class="form-control" name="coupon_code" placeholder="Coupon code">
                             <span class="input-group-append"> 
-                                <button class="btn btn-primary">Apply</button>
+                                <button type="submit"  class="btn btn-primary">Apply</button>
                             </span>
                         </div>
                     </div>
+                    {% if cart.coupon %}
+                    <a href="{% url 'remove_coupon' cart.uid %}" class="btn">Reomve Coupon</a>
+                    {% endif %}
                 </form>
                 </div> <!-- card-body.// -->
             </div>  <!-- card .// -->
             <div class="card">
                 <div class="card-body">
+                    <dl class="dlist-align">
+                        {% if cart.coupon.discount_price %}
+                        <dt>Discount:</dt>
+                        <dd class="text-right">₹{{cart.coupon.discount_price}}</dd>
+                      </dl>
+                      {% endif %}
                         <dl class="dlist-align">
                           <dt>Total price:</dt>
-                          <dd class="text-right">{{cart.get_cart_total}}</dd>
-                        </dl>
-                        <dl class="dlist-align">
-                          <dt>Discount:</dt>
-                          <dd class="text-right">USD 658</dd>
-                        </dl>
-                        <dl class="dlist-align">
-                          <dt>Total:</dt>
-                          <dd class="text-right  h5"><strong>$1,650</strong></dd>
+                          <dd class="text-right">₹{{cart.get_cart_total}}</dd>
                         </dl>
                         <hr>
                         <p class="text-center mb-3">

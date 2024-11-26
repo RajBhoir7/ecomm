@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate,login
-from .models import Profile
-
+from .models import Profile,CartItems,Cart
+from products.models import ProductImage,Product
 
 
 
@@ -54,7 +54,7 @@ def login_page(request):
                 return HttpResponseRedirect(request.path_info)
                 
             login(request,user1)
-            return redirect('/register')
+            return redirect('login')
         
         else:
             messages.warning(request, "Incorrect Password")
@@ -73,3 +73,21 @@ def activate_email(request,email_token):
         return redirect('login')
     except Exception as e:
         return HttpResponse(request,'Invalid Email Verification')
+
+def remove_cart(request,cart_item_uid):
+    try:
+        cart_item = CartItems.objects.get(uid = cart_item_uid)
+        cart_item.delete()
+    except Exception as e:
+        print(e)
+        
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+
+
+def Cart_view(request):   
+
+    context = {'cart_items':CartItems.objects.filter(cart=Cart.objects.get(is_paid=False,user=request.user)),
+               'cart':Cart.objects.get(is_paid=False,user=request.user)               }
+    return render(request,'accounts/carts.html',context)

@@ -84,7 +84,7 @@
                     <button class="btn btn-light" type="button" id="button-minus"> − </button>
                   </div>
                 </div>
-            </div> <!-- col.// -->
+            </div> 
 
             {% if obj.size_variant.count %}
             <div class="form-group col-md">
@@ -105,17 +105,17 @@
                       
     
                     </div>
-            </div> <!-- col.// -->
+            </div> 
             {% endif %}
             
-        </div> <!-- row.// -->
+        </div> 
     
         <a href="#" class="btn  btn-primary"> Buy now </a>
-        <a href="#" class="btn  btn-outline-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
-    </article> <!-- product-info-aside .// -->
-            </main> <!-- col.// -->
-        </div> <!-- row.// -->
-    </div> <!-- card.// -->
+        <a href="{% url 'add_to_cart' obj.uid %}?varient={{selected_size}}" class="btn  btn-outline-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+    </article> 
+            </main> 
+                  </div> 
+    </div> 
     <!-- ============================ COMPONENT 1 END .// ================================= -->
     
 

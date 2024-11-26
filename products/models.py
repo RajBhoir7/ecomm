@@ -3,6 +3,7 @@ from base.models import BaseModel
 from django.utils.text import slugify
 
 
+
 class Category(BaseModel):
     category_name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True,null=True,blank=True)
@@ -39,6 +40,7 @@ class Product(BaseModel):
     product_description = models.TextField()
     color_variant = models.ManyToManyField(ColorVariant,null=True,blank=True)
     size_variant = models.ManyToManyField(SizeVariant,null=True,blank=True) 
+    
 
     def save(self,*args,**kwargs):
         self.slug = slugify(self.product_name)
@@ -57,3 +59,6 @@ class Product(BaseModel):
 class ProductImage(BaseModel):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name='product_images')
     image = models.ImageField(upload_to='product')
+
+    def __str__(self) -> str:
+        return self.product.product_name

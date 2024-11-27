@@ -136,3 +136,9 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "roott208@gmail.com"
 EMAIL_HOST_PASSWORD = "tueupwzyehlladml"
+
+
+
+
+KEY = 'rzp_test_FJ97ggfSZBUi4J'
+SECRET = 'Vt1Mj6KtxdqhAkQ84EMLh9gP'

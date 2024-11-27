@@ -28,6 +28,9 @@ class Cart(BaseModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='carts')
     coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,blank=True,null=True)
     is_paid = models.BooleanField(default=False)
+    razor_pay_order_id = models.CharField(max_length=200,null=True,blank=True)
+    razor_pay_payment_id = models.CharField(max_length=200,null=True,blank=True)
+    razor_pay_payment_signature = models.CharField(max_length=200,null=True,blank=True)
 
     def __str__(self) -> str:
         return self.user.username

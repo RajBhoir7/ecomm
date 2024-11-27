@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate,login
 from .models import Profile,CartItems,Cart
 from products.models import ProductImage,Product,Coupon
-
+import razorpay
 
 
 def register_page(request):
@@ -85,11 +85,10 @@ def remove_cart(request,cart_item_uid):
 
 
 
-
+from django.conf import settings
 def Cart_view(request):   
 
-    context = {'cart_items':CartItems.objects.filter(cart=Cart.objects.get(is_paid=False,user=request.user)),
-               'cart':Cart.objects.get(is_paid=False,user=request.user)}
+    
     cart_obj = Cart.objects.get(is_paid=False,user=request.user)
     if request.method == 'POST':
         coupon = request.POST.get('coupon_code')
@@ -115,7 +114,18 @@ def Cart_view(request):
         cart_obj.save()
         messages.success(request, "Coupon applied")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    
+        
+
+
+    client = razorpay.Client(auth=(settings.KEY,settings.SECRET))
+    payment = client.order.create({'amount':cart_obj.get_cart_total()*100,'currency':'INR','payment_capture':1})
+    print('**************************')
+    print(payment)
+    print('**************************')
+    cart_obj.razor_pay_order_id = payment['id']
+    cart_obj.save()
+    context = {'cart_items':CartItems.objects.filter(cart=Cart.objects.get(is_paid=False,user=request.user)),
+               'cart':Cart.objects.get(is_paid=False,user=request.user),'payment':payment}
     return render(request,'accounts/carts.html',context)
 
 
@@ -125,3 +135,10 @@ def remove_coupon(request,cart_id):
     cart.save()
     messages.success(request,'Coupon Removed!')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def success(request):
+    #order_id = request.GET.get('order_id')
+    cart = Cart.objects.get(user=request.user)
+    cart.is_paid = True
+    cart.delete()
+    return HttpResponse('Paymetn success')

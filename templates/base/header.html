@@ -32,16 +32,22 @@
             </div> 
         </div>
         <div class="col-lg-6 col-sm-12">
-            <form action="#" class="search">
+
+
+            <form action="#" class="search" method="GET">
+                {% csrf_token %}
                 <div class="input-group w-100">
-                    <input type="text" class="form-control" placeholder="Search">
+                    <input type="text" class="form-control" placeholder="Search" name="Search_product">
                     <div class="input-group-append">
                       <button class="btn btn-primary" type="submit">
                         <i class="fa fa-search"></i>
                       </button>
                     </div>
                 </div>
-            </form> <!-- search-wrap .end// -->
+            </form>
+            
+            
+            <!-- search-wrap .end// -->
         </div> <!-- col.// -->
 
         
@@ -55,14 +61,19 @@
                     <a href="#" class="icon icon-sm rounded-circle border"><i class="fa fa-user"></i></a>
                     <div class="text">
                         <span class="text-muted">Welcome!</span>
+                        {% if user.is_authenticated %}
                         <div> 
-                            <a href="{% url 'login' %}">Sign in</a> |  
+                            <a href="{% url 'logout' %}">Logout</a> 
+                        </div>
+                        {% else %}
+                        <div> 
+                            <a href="{% url 'login' %}">Login</a> |  
                             <a href="{% url 'register' %}"> Register</a>
                         </div>
+                        {% endif %}
+
                     </div>
-                    <div class="ml-5">
-                        {{request.user}}
-                    </div>
+                    
                 </div>
             </div> <!-- widgets-wrap.// -->
         </div> <!-- col.// -->
@@ -72,4 +83,8 @@
     </section> <!-- header-main .// -->
     </header>
 
+    
+
+
+    
 

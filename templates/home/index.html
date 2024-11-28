@@ -6,7 +6,7 @@
 
 <div class="container mt-5 pt-5">
     
-    
+    {% if products %}
     <div class="row">
         {% for product in products %}
         <div class="col-md-3" >
@@ -22,9 +22,38 @@
         </div> <!-- col.// -->
         {% endfor %}
     </div>
+    {% else %}
+    <a href="{% url 'index' %}" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue shopping </a>
+    <h1>Product Not Available</h1>
+    {% endif %}
    
     
     </div>
-   
+
+<div class="h-100 d-flex align-items-center justify-content-center">
+    <nav aria-label="...">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+            {% if products.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{products.previous_page_number}}" tabindex="-1">Previous</a>
+          </li>
+          {% endif %}
+          <li class="page-item">
+            <a class="page-link" href="#" tabindex="-1">Page : {{products.number}} of {{products.paginator.num_pages}}</a>
+          </li>
+          {% if products.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{products.next_page_number}}">Next</a>
+          </li>
+          {% endif %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{products.paginator.num_pages}}">Last</a>
+          </li>
+        
+        </ul>
+      </nav>
+    </div>
 
 {% endblock %}
+

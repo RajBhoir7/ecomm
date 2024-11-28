@@ -60,6 +60,8 @@ class ProductImage(BaseModel):
     def __str__(self) -> str:
         return self.product.product_name
     
+    
+    
 class Coupon(BaseModel):
     coupon_code = models.CharField(max_length=200)
     is_expired = models.BooleanField(default=False)

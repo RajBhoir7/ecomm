@@ -1,5 +1,5 @@
 {% extends 'base/base.html' %}
-
+{% load static %}
 
 {% block start %}
 
@@ -9,7 +9,9 @@
 
 <section class="section-content padding-y">
     <div class="container">
-    
+        {% if not cart_items %}
+        <h3>No Cart items</h3>
+        {% endif %}
     <div class="row">
         <main class="col-md-9">
     <div class="card">
@@ -26,7 +28,8 @@
     <tbody>
 
 {% for item in cart_items  %}
-
+<h1>d</h1>
+{{obj.product__product_name}}
     <tr>
         <td>
             <figure class="itemside">
@@ -71,8 +74,9 @@
     </table>
     
     <div class="card-body border-top">
+        {% if cart_items  %}
         <button id="rzp-button1" class="btn btn-primary float-md-right">Pay with Razorpay</button>
-        
+        {% endif %}
         <a href="{% url 'index' %}" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue shopping </a>
     </div>	
     </div> <!-- card.// -->
@@ -114,14 +118,21 @@
                       {% endif %}
                         <dl class="dlist-align">
                           <dt>Total price:</dt>
-                          <dd class="text-right">₹{{cart.get_cart_total}}</dd>
+                          <dd class="text-right">
+                            {% if cart.get_cart_total > 1 %}
+                            ₹{{cart.get_cart_total}}</dd>
+                            {% endif %}
                         </dl>
                         <hr>
-                        <p class="text-center mb-3">
-                            <img src="images/misc/payments.png" height="26">
-                        </p>
                         
-                </div> <!-- card-body.// -->
+                        
+                </div> 
+                
+                <p class="text-center mb-3">
+                    <img src="{% static 'images/UPI.jpg' %}" height="26">
+                </p>
+                
+                <!-- card-body.// -->
             </div>  <!-- card .// -->
         </aside> <!-- col.// -->
     </div>

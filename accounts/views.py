@@ -2,10 +2,13 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
 from .models import Profile,CartItems,Cart
 from products.models import ProductImage,Product,Coupon
 import razorpay
+
+from django.urls import reverse
 
 
 def register_page(request):
@@ -35,7 +38,6 @@ def register_page(request):
 
 
 def login_page(request):
-
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -47,22 +49,22 @@ def login_page(request):
         
         user1 = authenticate(username=email,password=password)
         if user1:
-            
             #account Verification Status Check
             if Profile.objects.filter(user__username=email)[0].is_email_verified != True:
                 messages.warning(request, "Your account needs Verification")
                 return HttpResponseRedirect(request.path_info)
                 
             login(request,user1)
-            return redirect('login')
-        
+            return redirect('http://127.0.0.1:8000/')
         else:
             messages.warning(request, "Incorrect Password")
             return HttpResponseRedirect(request.path_info)
-
+        
     return render(request,'accounts/login.html')
 
-
+def Logout_User(request):
+    logout(request)
+    return redirect('login')
 
 
 def activate_email(request,email_token):
@@ -73,7 +75,8 @@ def activate_email(request,email_token):
         return redirect('login')
     except Exception as e:
         return HttpResponse(request,'Invalid Email Verification')
-
+    
+@login_required(login_url='http://127.0.0.1:8000/accounts/login/')
 def remove_cart(request,cart_item_uid):
     try:
         cart_item = CartItems.objects.get(uid = cart_item_uid)
@@ -84,12 +87,22 @@ def remove_cart(request,cart_item_uid):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
+#    obj = ProductImage.objects.get(product__product_name=product_name)
+ 
+
+
+
 
 from django.conf import settings
-def Cart_view(request):   
+@login_required(login_url='http://127.0.0.1:8000/accounts/login/')
 
-    
-    cart_obj = Cart.objects.get(is_paid=False,user=request.user)
+def Cart_view(request):   
+    cart_obj = None
+    try:
+        cart_obj = Cart.objects.get(is_paid=False,user=request.user)
+    except Exception as e:
+        print(e)
+        
     if request.method == 'POST':
         coupon = request.POST.get('coupon_code')
         coupon_obj = Coupon.objects.filter(coupon_code__icontains=coupon)
@@ -116,17 +129,20 @@ def Cart_view(request):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         
 
+    if cart_obj:
+        client = razorpay.Client(auth=(settings.KEY,settings.SECRET))
+        payment = client.order.create({'amount':cart_obj.get_cart_total()*100,'currency':'INR','payment_capture':1})
+        cart_obj.razor_pay_order_id = payment['id']
+        cart_obj.save()
 
-    client = razorpay.Client(auth=(settings.KEY,settings.SECRET))
-    payment = client.order.create({'amount':cart_obj.get_cart_total()*100,'currency':'INR','payment_capture':1})
-    print('**************************')
-    print(payment)
-    print('**************************')
-    cart_obj.razor_pay_order_id = payment['id']
-    cart_obj.save()
-    context = {'cart_items':CartItems.objects.filter(cart=Cart.objects.get(is_paid=False,user=request.user)),
-               'cart':Cart.objects.get(is_paid=False,user=request.user),'payment':payment}
-    return render(request,'accounts/carts.html',context)
+        
+        context = {'cart_items':CartItems.objects.filter(cart=Cart.objects.get(is_paid=False,user=request.user)),
+               'cart':Cart.objects.get(is_paid=False,user=request.user),'payment':payment,
+               'obj':ProductImage.objects.all()
+               
+               }
+        return render(request,'accounts/carts.html',context)
+    return render(request,'accounts/carts.html')
 
 
 def remove_coupon(request,cart_id):
